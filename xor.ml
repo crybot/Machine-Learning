@@ -3,23 +3,9 @@ open Slap.Size;;
 open Slap.Io;;
 open Slap.D;;
 open Slap.Common;;
+open ML;;
 
 let bias_input = -1.;; (* Bias input node value *)
-
-(* Compute C = A - B    *)
-let diff a b = 
-  let c = Mat.copy a in
-  Mat.axpy ~alpha: (-1.) b c;
-  c;;
-
-(* Compute C = A * k    *)
-let mul mat k = Mat.map (fun x->x *. k) mat;;
-
-(* Compute dot multiplication between two matrices *)
-let dot = gemm ~transa:normal ~transb:normal;;
-
-(* Compute dot multiplicate between two matrices with first one transposed *)
-let dot_t = gemm ~transa:trans ~transb:normal;;
 
 (* Threshold function *)
 let threshold x = if x > 0. then 1. else 0. ;; 
@@ -37,6 +23,9 @@ let targets = [%mat[
                      [1.]]];;
 
 let () = 
+
+  Random.self_init(); (* Initialize a random seed *)
+
   let weights = 
     let (rows, cols) = (Mat.dim2 inputs, Mat.dim2 targets) in 
     Mat.random rows cols in
